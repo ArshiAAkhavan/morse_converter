@@ -1,46 +1,113 @@
-//#include "Keypad.h"
 #include "MultitapKeypad.h"
 
+// arduino config
+byte LED=5;
+
+
+//default values of the keypad
 const byte Rows= 4;
 const byte Cols= 4;
+const byte taps= 4;// number of the key variations
 
-byte keymap[Rows][Cols] = {
+// yadet bashe bayad ino taghyir bedam
+byte keymap[Rows][Cols][taps] = {{
   {'1', '2', '3', 'A'},
   {'4', '5', '6', 'B'},
   {'7', '8', '9', 'C'},
   {'*', '0', '#', 'D'}
+},
+{
+  {'a', 'd', 'g', 'A'},
+  {'j', 'm', 'p', 'B'},
+  {'s', 'v', 'y', 'C'},
+  {'*', '0', '#', 'D'}
+},
+{
+  {'b', 'e', 'h', 'A'},
+  {'k', 'n', 'q', 'B'},
+  {'t', 'w', 'z', 'C'},
+  {'*', '0', '#', 'D'}
+},
+{
+  {'c', 'f', 'i', 'A'},
+  {'l', 'n', 'r', 'B'},
+  {'u', 'x', '9', 'C'},
+  {'*', '0', '#', 'D'}
+},
+
 };
 
-//  a char array is defined as it can be seen on the above
 
 
-//keypad connections to the arduino terminals is given as:
+const short shortGap=500;
+const short wordGap=2000;
+byte morseCode[37]={235,189,192,225,240,165,228,162,234,175,226,171,238,237,229,174,199,219,216,241,217,163,220,190,193,198,121,40,13,4,1,0,81,108,117,120};
 
-byte rPins[Rows]= {22,24,26,28}; //Rows 0 to 3
-byte cPins[Cols]= {30,32,34,36}; //Columns 0 to 2
+
+void bip(byte bipbip){
+  if(bipbip==0)
+}
+
+void genMorse(byte code){
+  while(code>0){
+    if(code%3==2)return;
+    bip(code%3);
+    code/=3;
+  }
+}
+
+
 
 MultitapKeypad kpd(22 , 24 , 26 , 28 ,
-                    30 , 32 , 34 , 36 );
-                 
+                   30 , 32 , 34 , 36 );
 
-// command for library forkeypad
-//initializes an instance of the Keypad class
-//Keypad kpd= Keypad(makeKeymap(keymap), rPins, cPins, Rows, Cols);
 
+byte getKeyPressed(Key key){
+     if(key.character>=48+1 && key.character<=48+9){
+        byte temp=key.character-49;
+        byte row=temp/3;
+        byte col=temp%3;
+        return keymap[key.tapCounter%4][row][col];  
+     }
+     return key.character;
+}
+Key prevKey;
+void handleKey(Key key){
+  if(key.tapCounter==0){
+          Serial.print(getKeyPressed(prevKey));
+          Serial.print(" ");
+          Serial.println(prevKey.tapCounter);
+    }
+    prevKey=key;
+}
+void flush(){
+  if(prevKey.tapCounter==0){
+          Serial.print(getKeyPressed(prevKey));
+          Serial.print(" ");
+          Serial.println(prevKey.tapCounter);
+    }
+}
 void setup()
 {
      Serial.begin(9600);  // initializing serail monitor
+     prevKey = kpd.getKey();
+     pinMode(LED,output);
+     
 }
-
-//If key is pressed, this key is stored in 'keypressed' variable
-//If key is not equal to 'NO_KEY', then this key is printed out
 void loop()
 {
      Key key = kpd.getKey();
      if (key.code != NO_KEY)
      { 
-          Serial.print(key.character);
-          Serial.print(" ");
-          Serial.println(key.tapCounter);
+      handleKey(key);
+//          Serial.print(getKeyPressed(key));
+//          Serial.print(" ");
+//          Serial.println(key.tapCounter);
+     }else{
+                Serial.print("____");
+                Serial.print(" ");
+                Serial.println(key.tapCounter);
+
+//        flush();    
      }
 }
