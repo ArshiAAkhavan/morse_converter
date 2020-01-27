@@ -1,15 +1,10 @@
-/* the tutorial code for 3x4 Matrix Keypad with Arduino is as
-This code prints the key pressed on the keypad to the serial port*/
+//#include "Keypad.h"
+#include "MultitapKeypad.h"
 
-#include "Keypad.h"
+const byte Rows= 4;
+const byte Cols= 4;
 
-const byte Rows= 4; //number of rows on the keypad i.e. 4
-const byte Cols= 4; //number of columns on the keypad i,e, 3
-
-//we will definne the key map as on the key pad:
-
-
-char keymap[Rows][Cols] = {
+byte keymap[Rows][Cols] = {
   {'1', '2', '3', 'A'},
   {'4', '5', '6', 'B'},
   {'7', '8', '9', 'C'},
@@ -24,9 +19,13 @@ char keymap[Rows][Cols] = {
 byte rPins[Rows]= {22,24,26,28}; //Rows 0 to 3
 byte cPins[Cols]= {30,32,34,36}; //Columns 0 to 2
 
+MultitapKeypad kpd(22 , 24 , 26 , 28 ,
+                    30 , 32 , 34 , 36 );
+                 
+
 // command for library forkeypad
 //initializes an instance of the Keypad class
-Keypad kpd= Keypad(makeKeymap(keymap), rPins, cPins, Rows, Cols);
+//Keypad kpd= Keypad(makeKeymap(keymap), rPins, cPins, Rows, Cols);
 
 void setup()
 {
@@ -37,9 +36,11 @@ void setup()
 //If key is not equal to 'NO_KEY', then this key is printed out
 void loop()
 {
-     char keypressed = kpd.getKey();
-     if (keypressed != NO_KEY)
+     Key key = kpd.getKey();
+     if (key.code != NO_KEY)
      { 
-          Serial.println(keypressed);
+          Serial.print(key.character);
+          Serial.print(" ");
+          Serial.println(key.tapCounter);
      }
 }
