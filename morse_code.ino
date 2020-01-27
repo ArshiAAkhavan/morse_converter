@@ -39,7 +39,7 @@ byte keymap[Rows][Cols][taps] = {{
 
 
 
-const short shortGap=500;
+const short shortGap=1250;
 const short wordGap=2000;
 const short dahGap=400;
 const short ditGap=100;
@@ -56,7 +56,11 @@ void bip(byte bipbip){
 }
 
 void genMorse(byte code){
-  while(code>0){
+  Serial.print("daram ino mikonam: ");
+  Serial.println(code);
+  for(int i=0;i<5;i++){
+    Serial.println("so it begins");
+    Serial.println(code%3);
     if(code%3==2)return;
     bip(code%3);
     code/=3;
@@ -79,25 +83,21 @@ byte getKeyPressed(Key key){
      return key.character;
 }
 Key prevKey;
+bool i_did_it_once=1;
 void handleKey(Key key){
-  if(key.tapCounter==0){
-          byte inputChar=getKeyPressed(prevKey);
+//  if(key.tapCounter==0){
+          byte inputChar=getKeyPressed(key);
           if(inputChar>='a' && inputChar<='z')inputChar-='a';
           else if(inputChar>='0' && inputChar<='9')inputChar+=26-'0';
-
+        
+          Serial.print(getKeyPressed(key));
+          Serial.print(" ");
+          Serial.println(prevKey.tapCounter);
+          if(i_did_it_once)
           genMorse(morseCode[inputChar]);
-          Serial.print(getKeyPressed(prevKey));
-          Serial.print(" ");
-          Serial.println(prevKey.tapCounter);
-    }
-    prevKey=key;
-}
-void flush(){
-  if(prevKey.tapCounter==0){
-          Serial.print(getKeyPressed(prevKey));
-          Serial.print(" ");
-          Serial.println(prevKey.tapCounter);
-    }
+          i_did_it_once=(i_did_it_once+1)%2;
+//    }
+//    prevKey=key;
 }
 void setup()
 {
@@ -111,15 +111,6 @@ void loop()
      Key key = kpd.getKey();
      if (key.code != NO_KEY)
      { 
-      handleKey(key);
-//          Serial.print(getKeyPressed(key));
-//          Serial.print(" ");
-//          Serial.println(key.tapCounter);
-     }else{
-                Serial.print("____");
-                Serial.print(" ");
-                Serial.println(key.tapCounter);
-
-//        flush();    
+        handleKey(key);
      }
 }
