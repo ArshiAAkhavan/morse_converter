@@ -41,11 +41,18 @@ byte keymap[Rows][Cols][taps] = {{
 
 const short shortGap=500;
 const short wordGap=2000;
+const short dahGap=400;
+const short ditGap=100;
+short dGaps[2]={ditGap,dahGap};
 byte morseCode[37]={235,189,192,225,240,165,228,162,234,175,226,171,238,237,229,174,199,219,216,241,217,163,220,190,193,198,121,40,13,4,1,0,81,108,117,120};
 
 
 void bip(byte bipbip){
-  if(bipbip==0)
+  digitalWrite(LED,HIGH);
+  delay(dGaps[bipbip]);
+  digitalWrite(LED,LOW);
+  delay(shortGap);
+  
 }
 
 void genMorse(byte code){
@@ -74,6 +81,11 @@ byte getKeyPressed(Key key){
 Key prevKey;
 void handleKey(Key key){
   if(key.tapCounter==0){
+          byte inputChar=getKeyPressed(prevKey);
+          if(inputChar>='a' && inputChar<='z')inputChar-='a';
+          else if(inputChar>='0' && inputChar<='9')inputChar+=26-'0';
+
+          genMorse(morseCode[inputChar]);
           Serial.print(getKeyPressed(prevKey));
           Serial.print(" ");
           Serial.println(prevKey.tapCounter);
@@ -91,7 +103,7 @@ void setup()
 {
      Serial.begin(9600);  // initializing serail monitor
      prevKey = kpd.getKey();
-     pinMode(LED,output);
+     pinMode(LED,OUTPUT);
      
 }
 void loop()
