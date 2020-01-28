@@ -95,6 +95,7 @@ void handleButton(){
      Serial.print(prevButton);
      Serial.print(" : ");
      Serial.println(button);
+     
      if(prevButton!=button){
         output_is_generated=0;
         
@@ -104,12 +105,14 @@ void handleButton(){
           outputChar*=3;
           if(deltaTime[1]>3)outputChar+=1; 
         }
+        deltaTime[prevButton]=0;
         
      }
      for(int i=0;i<2;i++)deltaTime[i]+=allowCount[i];
      if(deltaTime[0]>10 && ! output_is_generated){
         output_is_generated=1;
         morseDecode(outputChar);
+        outputChar=2;
      }
      prevButton=button;
      
@@ -118,6 +121,10 @@ void handleButton(){
 #include <LiquidCrystal.h> 
  LiquidCrystal lcd(48, 50, 46, 44, 42, 40);  
 
+
+ void showLCD(char input){
+    lcd.print(input);
+ }
  void LCDsetup()
  {
      lcd.begin(16, 2);
