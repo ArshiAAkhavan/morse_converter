@@ -15,8 +15,12 @@ void bip(byte bipbip){
   
 }
 
-void morseCoder(byte input){
+void morseCode(byte input){
   genMorse(morseCodes[input]);
+}
+void morseDecode(int input){
+  Serial.print("input: ");
+  Serial.println(input);
 }
 
 void genMorse(byte code){

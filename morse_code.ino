@@ -73,7 +73,7 @@ void handleKey(Key key){
   if(key.character==KEY_HASHTAG){
           Serial.println("\nmorse:");
           for(int i=1;i<bufferSize;i++,Serial.print(" "))Serial.print(inputBuffer[i]);Serial.println();
-          for(int i=1;i<bufferSize;i++)morseCoder(inputBuffer[i]);
+          for(int i=1;i<bufferSize;i++)morseCode(inputBuffer[i]);
           bufferSize=0;  
   }
   
@@ -82,45 +82,49 @@ void handleKey(Key key){
 
 
 const byte BUTTON = 7;
-int milisecondCounter=0;
-byte prevButton=0;
-int generatedChar=2;
+
+int prevButton=0;
+int deltaTime[2]={0};
+int allowCount[2]={0};
+int outputChar=2;
+bool output_is_generated=0;
+
+
 void handleButton(){
      byte button=digitalRead(BUTTON);
      Serial.print(prevButton);
      Serial.print(" : ");
      Serial.println(button);
-     
-     if(button==0){
-        if(!(prevButton==0 || milisecondCounter==0)){
-        if(milisecondCounter<=3)generatedChar*=3;
-        else generatedChar=generatedChar*3+1;
-        milisecondCounter=0;
-        Serial.print("Input: ");
-        Serial.println(generatedChar);
+     if(prevButton!=button){
+        output_is_generated=0;
+        
+        allowCount[button]=1;
+        allowCount[prevButton]=0;
+        if(button==0){
+          outputChar*=3;
+          if(deltaTime[1]>3)outputChar+=1; 
         }
+        
      }
-     if (button==1)milisecondCounter++;
+     for(int i=0;i<2;i++)deltaTime[i]+=allowCount[i];
+     if(deltaTime[0]>10 && ! output_is_generated){
+        output_is_generated=1;
+        morseDecode(outputChar);
+     }
      prevButton=button;
      
 }
 
 #include <LiquidCrystal.h> 
- LiquidCrystal lcd(43, 41, 39, 37, 35, 33);  
+ LiquidCrystal lcd(48, 50, 46, 44, 42, 40);  
 
  void LCDsetup()
  {
      lcd.begin(16, 2);
-     lcd.clear();
-     
-  } 
- void LCDloop()
- { 
-   lcd.setCursor(0, 0);
-   lcd.print("hello world");  
-   //delay(2000);
- }
-
+     lcd.print("sara radan");
+     lcd.setCursor(5,0);
+     lcd.print("dabbe"); 
+ } 
 void setup()
 {
      Serial.begin(9600);  // initializing serail monitor
@@ -131,7 +135,6 @@ void setup()
 }
 void loop()
 {
-       LCDloop();
        handleButton();
        delay(100);
 //     Key key = kpd.getKey();
