@@ -41,7 +41,7 @@ byte keymap[Rows][Cols][taps] = {{
 
 
 
-const short shortGap=200;// between each dit &dah
+const short shortGap=500;// between each dit &dah
 const short letterGap=1000;// between to letter
 const short dahGap=500;
 const short ditGap=100;
