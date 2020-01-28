@@ -26,6 +26,15 @@ int f(int n){
   return ret;
 }
 
+int ff(int n){
+  int t=0;
+  while(n>0){
+    t=t*10+n%10;
+    n/=10;
+  }
+  return t;
+}
+
 int main(){
   int a,n;
   cin>>n;
@@ -34,5 +43,6 @@ int main(){
     cin>>a;
     // debug(a);
     cout<<f(a)<<",";
+    // cout<<waitChar<<"\t"<<ff(a)<<"\n";
   }
 }

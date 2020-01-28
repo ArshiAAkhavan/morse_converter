@@ -11,7 +11,6 @@ const byte Rows= 4;
 const byte Cols= 4;
 const byte taps= 4;// number of the key variations
 
-// yadet bashe bayad ino taghyir bedam
 byte keymap[Rows][Cols][taps] = {{
   {'1', '2', '3', 'A'},
   {'4', '5', '6', 'B'},
@@ -39,37 +38,8 @@ byte keymap[Rows][Cols][taps] = {{
 
 };
 
-
-
-const short shortGap=500;// between each dit &dah
-const short letterGap=1000;// between to letter
-const short dahGap=500;
-const short ditGap=100;
-short dGaps[2]={ditGap,dahGap};
-byte morseCode[37]={235,189,192,225,240,165,228,162,234,175,226,171,238,237,229,174,199,219,216,241,217,163,220,190,193,198,121,40,13,4,1,0,81,108,117,120};
 byte inputBuffer[1000];
-int pointer=0;
-
-void bip(byte bipbip){
-  digitalWrite(LED,HIGH);
-  delay(dGaps[bipbip]);
-  digitalWrite(LED,LOW);
-  delay(shortGap);
-  
-}
-
-void genMorse(byte code){
-  Serial.print("daram ino mikonam: ");
-  Serial.println(code);
-  for(int i=0;i<5;i++){
-    if(code%3==2)break;
-    Serial.print(code%3);
-    bip(code%3);
-    code/=3;
-  }
-  delay(letterGap);
-  Serial.println();
-}
+int bufferSize=0;
 
 
 
@@ -95,34 +65,78 @@ void handleKey(Key key){
           byte inputChar=getKeyPressed(prevKey);
           if(inputChar>='a' && inputChar<='z')inputChar-='a';
           else if(inputChar>='0' && inputChar<='9')inputChar+=26-'0';
-          inputBuffer[pointer++]=inputChar;    
+          inputBuffer[bufferSize++]=inputChar;    
           Serial.print(getKeyPressed(prevKey));
           Serial.print(" ");
           Serial.println(prevKey.tapCounter);
   }
   if(key.character==KEY_HASHTAG){
           Serial.println("\nmorse:");
-          for(int i=1;i<pointer;i++,Serial.print(" "))Serial.print(inputBuffer[i]);Serial.println();
-          for(int i=1;i<pointer;i++)genMorse(morseCode[inputBuffer[i]]);
-          pointer=0;  
+          for(int i=1;i<bufferSize;i++,Serial.print(" "))Serial.print(inputBuffer[i]);Serial.println();
+          for(int i=1;i<bufferSize;i++)morseCoder(inputBuffer[i]);
+          bufferSize=0;  
   }
   
   prevKey=key;
 }
 
 
+const byte BUTTON = 7;
+int milisecondCounter=0;
+byte prevButton=0;
+int generatedChar=2;
+void handleButton(){
+     byte button=digitalRead(BUTTON);
+     Serial.print(prevButton);
+     Serial.print(" : ");
+     Serial.println(button);
+     
+     if(button==0){
+        if(!(prevButton==0 || milisecondCounter==0)){
+        if(milisecondCounter<=3)generatedChar*=3;
+        else generatedChar=generatedChar*3+1;
+        milisecondCounter=0;
+        Serial.print("Input: ");
+        Serial.println(generatedChar);
+        }
+     }
+     if (button==1)milisecondCounter++;
+     prevButton=button;
+     
+}
+
+#include <LiquidCrystal.h> 
+ LiquidCrystal lcd(43, 41, 39, 37, 35, 33);  
+
+ void LCDsetup()
+ {
+     lcd.begin(16, 2);
+     lcd.clear();
+     
+  } 
+ void LCDloop()
+ { 
+   lcd.setCursor(0, 0);
+   lcd.print("hello world");  
+   //delay(2000);
+ }
+
 void setup()
 {
      Serial.begin(9600);  // initializing serail monitor
      prevKey = kpd.getKey();
      pinMode(LED,OUTPUT);
-     
+     pinMode(BUTTON,INPUT);
+     LCDsetup();
 }
 void loop()
 {
-     Key key = kpd.getKey();
-     if (key.code != NO_KEY)
-     { 
-        handleKey(key);
-     }
+       LCDloop();
+       handleButton();
+       delay(100);
+//     Key key = kpd.getKey();
+//     if (key.code != NO_KEY)
+//     { 
+//        handleKey(key);
+//     }
 }
