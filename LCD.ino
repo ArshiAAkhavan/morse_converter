@@ -12,6 +12,20 @@ void showLCD(char input){
       lcd.setCursor(cursorX,cursorY);
      }
 }
+
+void replaceLCD(char input){
+     cursorX--;
+     lcd.setCursor(cursorX,cursorY);
+     showLCD(input);
+}
+
+
+void clearLCD(){
+  lcd.clear();
+  cursorX=0;
+  cursorY=0;
+}
+
 void LCDsetup()
 {
      lcd.begin(16, 2);

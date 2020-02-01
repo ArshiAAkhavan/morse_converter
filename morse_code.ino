@@ -11,7 +11,11 @@ void setup(){
 
 void loop()
 {
-       if(digitalRead(MODE_SELECT)) decodeLoop();
+       Serial.print("mode select: ");
+       Serial.println(digitalRead(MODE_SELECT));
+       if(digitalRead(MODE_SELECT)){
+        decodeLoop();
+       }
        else encodeLoop();
 
 }
