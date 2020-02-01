@@ -56,28 +56,46 @@ byte getKeyPressed(Key key){
      return key.character;
 }
 
+void showKey(Key key){
+    switch(key.character){
+    case KEY_STAR:
+      backspaceLCD();
+      break;
+    case KEY_HASHTAG:
+      break;
+    default:
+     if (key.tapCounter!=0)replaceLCD(getKeyPressed(key));
+     else  showLCD(getKeyPressed(key));    
+  }
+}
 
 void handleKey(Key key){
-  
 
+  showKey(key);
+  
   if(key.tapCounter==0){
     if(key.character!=KEY_STAR && prevKey.character!=KEY_STAR){
           byte inputChar=getKeyPressed(prevKey);
-          if(inputChar>='a' && inputChar<='z')inputChar-='a';
-          else if(inputChar>='0' && inputChar<='9')inputChar+=26-'0';
           inputBuffer[bufferSize++]=inputChar;
           Serial.print(getKeyPressed(prevKey));
           Serial.print(" ");
           Serial.println(prevKey.tapCounter);
+    }else if(key.character==KEY_STAR){
+      prevKey.character=inputBuffer[bufferSize-1];
+      
     }
   }
   if(key.character==KEY_HASHTAG){
           Serial.println("\nmorse:");
-          for(int i=1;i<bufferSize;i++)showLCD(inputBuffer[i]+((inputBuffer[i]>=26)?'0'-26:'a'));    
           Serial.println("inputBuffers: ");
           for(int i=1;i<bufferSize;i++,Serial.print(" "))Serial.print(inputBuffer[i]+((inputBuffer[i]>=26)?'0'-26:'a'));Serial.println();
           for(int i=1;i<bufferSize;i++,Serial.print(" "))Serial.print(inputBuffer[i]);Serial.println();
-          for(int i=1;i<bufferSize;i++)morseCode(inputBuffer[i]);
+          for(int i=1;i<bufferSize;i++){
+            byte inputChar=inputBuffer[i];
+            if(inputChar>='a' && inputChar<='z')inputChar-='a';
+            else if(inputChar>='0' && inputChar<='9')inputChar+=26-'0';
+            morseCode(inputChar);
+          }
           bufferSize=0;  
   }
   prevKey=key;

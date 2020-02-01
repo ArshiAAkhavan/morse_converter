@@ -19,6 +19,13 @@ void replaceLCD(char input){
      showLCD(input);
 }
 
+void backspaceLCD(){
+  cursorX--;
+  lcd.setCursor(cursorX,cursorY);
+  lcd.print(' ');
+  lcd.setCursor(cursorX,cursorY);
+  
+}
 
 void clearLCD(){
   lcd.clear();
